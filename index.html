@@ -217,6 +217,71 @@
             margin-top: 8px;
         }
 
+        /* ── Featured Post ── */
+        .featured-post {
+            display: block;
+            position: relative;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            overflow: hidden;
+            text-decoration: none;
+            color: inherit;
+            transition: box-shadow 0.2s, transform 0.15s;
+            box-shadow: var(--shadow);
+        }
+
+        .featured-post:hover {
+            box-shadow: var(--shadow-hover);
+            transform: translateY(-1px);
+        }
+
+        .featured-post-bg {
+            position: absolute;
+            inset: 0;
+            background: url('blog/gaia2-cli/announcement_banner.png') center/cover no-repeat;
+            filter: blur(3px) brightness(0.35);
+            transform: scale(1.1);
+        }
+
+        .featured-post-content {
+            position: relative;
+            z-index: 1;
+            padding: 28px 28px;
+        }
+
+        .featured-badge {
+            display: inline-block;
+            background: var(--accent);
+            color: #fff;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 3px 10px;
+            border-radius: 5px;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+            margin-bottom: 12px;
+        }
+
+        .featured-post h3 {
+            font-size: 15.5px;
+            font-weight: 600;
+            margin-bottom: 4px;
+            line-height: 1.4;
+            color: #ffffff;
+        }
+
+        .featured-post p {
+            font-size: 14px;
+            color: rgba(255,255,255,0.8);
+            margin-bottom: 12px;
+        }
+
+        .featured-link {
+            font-size: 14px;
+            font-weight: 600;
+            color: #93b4fd;
+        }
+
         /* ── About ── */
         .about-text {
             font-size: 15.5px;
@@ -427,6 +492,7 @@
                 filter: brightness(0) invert(1);
             }
 
+
             .banner {
                 background: rgba(107,138,253,0.12);
                 border-bottom-color: var(--border);
@@ -511,6 +577,19 @@
             </div>
         </section>
 
+        <!-- Featured Post -->
+        <section>
+            <a href="blog/gaia2-cli/index.html" class="featured-post">
+                <div class="featured-post-bg"></div>
+                <div class="featured-post-content">
+                    <span class="featured-badge">New Blog Post</span>
+                    <h3>Gaia2-CLI: Evaluating Agentic Systems in Real Execution Environments</h3>
+                    <p>First-class terminal support for Gaia2 — evaluate agents like OpenClaw and Hermes-Agent in real execution environments.</p>
+                    <span class="featured-link">Read more &rarr;</span>
+                </div>
+            </a>
+        </section>
+
         <!-- About -->
         <section id="about">
             <h2 class="section-title">About</h2>
@@ -567,13 +646,13 @@
         <section id="blog">
             <h2 class="section-title">Blog</h2>
 
-            <a href="https://huggingface.co/blog/gaia2" target="_blank" rel="noopener" class="blog-card">
+            <a href="blog/gaia2-cli/index.html" class="blog-card">
                 <div class="blog-meta">
-                    <span>2025</span>
-                    <span class="tag">HuggingFace</span>
+                    <span>2026</span>
+                    <span class="tag">Blog Post</span>
                 </div>
-                <h3>Gaia2 and ARE: Empowering the community to study agents</h3>
-                <p class="blog-desc">Co-authored with Clémentine Fourrier. An overview of the GAIA2 benchmark and the ARE framework, and how the community can use them.</p>
+                <h3>Gaia2-CLI: Evaluating Agentic Systems in Real Execution Environments</h3>
+                <p class="blog-desc">First-class terminal support for Gaia2 — evaluate agents like OpenClaw and Hermes-Agent in real execution environments.</p>
             </a>
 
             <a href="https://huggingface.co/blog/meta-agents-research-environments/gaia2-new-models-evaluation" target="_blank" rel="noopener" class="blog-card">
@@ -585,14 +664,14 @@
                 <p class="blog-desc">New evaluation results on Gaia2 — Claude 4 Sonnet Extended Thinking, DeepSeek, Qwen, and more. Analysis of model coverage and community reception.</p>
             </a>
 
-            <div class="blog-card upcoming">
+            <a href="https://huggingface.co/blog/gaia2" target="_blank" rel="noopener" class="blog-card">
                 <div class="blog-meta">
-                    <span>Coming Soon</span>
-                    <span class="tag">Upcoming</span>
+                    <span>2025</span>
+                    <span class="tag">HuggingFace</span>
                 </div>
-                <h3>Gaia2-CLI</h3>
-                <p class="blog-desc">Run agents with direct terminal use (OpenClaw, Hermes-Agent, etc.) on GAIA2 environments.</p>
-            </div>
+                <h3>Gaia2 and ARE: Empowering the community to study agents</h3>
+                <p class="blog-desc">Co-authored with Clémentine Fourrier. An overview of the GAIA2 benchmark and the ARE framework, and how the community can use them.</p>
+            </a>
         </section>
 
         <!-- Contact -->

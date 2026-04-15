@@ -1,0 +1,1159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gaia2-CLI: Evaluating Agentic Systems in Real Execution Environments — Romain Froger</title>
+    <meta name="description" content="Gaia2-CLI adds first-class terminal support to the Gaia2 benchmark, enabling evaluation of agentic systems like OpenClaw and Hermes-Agent in real execution environments.">
+    <meta property="og:title" content="Gaia2-CLI: Evaluating Agentic Systems in Real Execution Environments">
+    <meta property="og:description" content="Gaia2-CLI adds first-class terminal support to the Gaia2 benchmark, enabling evaluation of agentic systems in real execution environments.">
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://romainfrog.github.io/blog/gaia2-cli/">
+    <meta property="og:image" content="https://romainfrog.github.io/blog/gaia2-cli/announcement_banner.png">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎓</text></svg>">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Source+Serif+4:ital,wght@0,500;0,600;0,700;1,400&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #ffffff;
+            --bg-alt: #f7f9fc;
+            --bg-card: #ffffff;
+            --text: #1a1a2e;
+            --text-secondary: #4a4a68;
+            --text-tertiary: #8888a4;
+            --accent: #2563eb;
+            --accent-light: #eff4ff;
+            --accent-hover: #1d4ed8;
+            --border: #e2e8f0;
+            --shadow: 0 1px 3px rgba(37,99,235,0.04), 0 1px 2px rgba(0,0,0,0.04);
+            --radius: 10px;
+            --max-width: 740px;
+            --code-bg: #f8fafc;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.7;
+        }
+
+        .container {
+            max-width: var(--max-width);
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        /* ── Nav ── */
+        nav {
+            position: sticky;
+            top: 0;
+            background: rgba(255,255,255,0.92);
+            border-bottom: 1px solid var(--border);
+            z-index: 100;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+
+        nav .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 54px;
+        }
+
+        nav .nav-name {
+            font-weight: 700;
+            font-size: 15px;
+            color: var(--text);
+            text-decoration: none;
+        }
+
+        nav .nav-links {
+            display: flex;
+            gap: 28px;
+            align-items: center;
+        }
+
+        nav .nav-links a {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        nav .nav-links a:hover { color: var(--accent); }
+
+        /* ── Article ── */
+        .article-header {
+            padding: 64px 0 32px;
+        }
+
+        .article-header .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--accent);
+            text-decoration: none;
+            margin-bottom: 24px;
+            transition: opacity 0.2s;
+        }
+
+        .article-header .back-link:hover { opacity: 0.7; }
+
+        .article-header h1 {
+            font-family: 'Source Serif 4', Georgia, serif;
+            font-size: 32px;
+            font-weight: 700;
+            line-height: 1.2;
+            margin-bottom: 16px;
+        }
+
+        .article-meta {
+            font-size: 14px;
+            color: var(--text-tertiary);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .article-meta .tag {
+            background: var(--accent-light);
+            color: var(--accent);
+            font-size: 11px;
+            font-weight: 700;
+            padding: 3px 10px;
+            border-radius: 5px;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+        }
+
+        /* ── Banner Image ── */
+        .article-banner {
+            width: 100%;
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+            margin-bottom: 40px;
+        }
+
+        /* ── Layout with Sidebar ── */
+        .article-layout {
+            position: relative;
+            max-width: var(--max-width);
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        .article-main {
+            max-width: var(--max-width);
+        }
+
+        /* ── Table of Contents ── */
+        .toc {
+            position: fixed;
+            top: 50%;
+            left: 24px;
+            transform: translateY(-50%);
+            width: 160px;
+        }
+
+        .toc-title {
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-tertiary);
+            margin-bottom: 12px;
+            display: block;
+        }
+
+        .toc ol {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            counter-reset: toc;
+        }
+
+        .toc li {
+            counter-increment: toc;
+            margin-bottom: 2px;
+        }
+
+        .toc a {
+            font-size: 12.5px;
+            font-weight: 500;
+            color: var(--text-tertiary);
+            text-decoration: none;
+            display: flex;
+            align-items: baseline;
+            gap: 8px;
+            padding: 5px 0;
+            transition: color 0.2s;
+            line-height: 1.3;
+        }
+
+        .toc a::before {
+            content: counter(toc);
+            font-size: 10px;
+            font-weight: 700;
+            color: var(--border);
+            min-width: 14px;
+        }
+
+        .toc a:hover {
+            color: var(--accent);
+        }
+
+        .toc a:hover::before {
+            color: var(--accent);
+        }
+
+        .toc a.active {
+            color: var(--accent);
+            font-weight: 600;
+        }
+
+        .toc a.active::before {
+            color: var(--accent);
+        }
+
+        @media (max-width: 1100px) {
+            .toc {
+                display: none;
+            }
+        }
+
+        /* ── Article Content ── */
+        .article-content {
+            padding-bottom: 64px;
+        }
+
+        .article-content p {
+            font-size: 15.5px;
+            color: var(--text-secondary);
+            margin-bottom: 20px;
+        }
+
+        .article-content h2[id] {
+            scroll-margin-top: 70px;
+        }
+
+        .article-content h2 {
+            font-family: 'Source Serif 4', Georgia, serif;
+            font-size: 22px;
+            font-weight: 600;
+            color: var(--text);
+            margin-top: 40px;
+            margin-bottom: 16px;
+        }
+
+        .article-content h2::after {
+            content: '';
+            display: block;
+            width: 40px;
+            height: 3px;
+            background: var(--accent);
+            border-radius: 2px;
+            margin-top: 8px;
+        }
+
+        .article-content a {
+            color: var(--accent);
+            text-decoration: none;
+            font-weight: 500;
+            transition: opacity 0.2s;
+        }
+
+        .article-content a:hover { opacity: 0.8; }
+
+        .article-content strong {
+            color: var(--text);
+            font-weight: 600;
+        }
+
+        .article-content ul, .article-content ol {
+            margin-bottom: 20px;
+            padding-left: 24px;
+        }
+
+        .article-content li {
+            font-size: 15.5px;
+            color: var(--text-secondary);
+            margin-bottom: 10px;
+        }
+
+        .article-content img {
+            max-width: 100%;
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+            margin: 24px 0;
+        }
+
+        .article-content .img-caption {
+            font-size: 13px;
+            color: var(--text-tertiary);
+            font-style: italic;
+            text-align: center;
+            margin-top: -16px;
+            margin-bottom: 24px;
+        }
+
+        /* ── Code Blocks ── */
+        .article-content pre {
+            background: var(--code-bg);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 20px 24px;
+            margin-bottom: 24px;
+            overflow-x: auto;
+        }
+
+        .article-content pre code {
+            font-family: 'Fira Code', monospace;
+            font-size: 13.5px;
+            line-height: 1.6;
+            color: var(--text);
+        }
+
+        .article-content code {
+            font-family: 'Fira Code', monospace;
+            font-size: 13.5px;
+            background: var(--code-bg);
+            border: 1px solid var(--border);
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+
+        .article-content pre code {
+            background: none;
+            border: none;
+            padding: 0;
+        }
+
+        /* ── Callout ── */
+        .callout {
+            background: var(--accent-light);
+            border-left: 4px solid var(--accent);
+            border-radius: 0 var(--radius) var(--radius) 0;
+            padding: 20px 24px;
+            margin: 28px 0;
+        }
+
+        .callout p {
+            color: var(--text);
+            margin-bottom: 0;
+        }
+
+        /* ── Links Section ── */
+        .links-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin: 20px 0;
+        }
+
+        .links-grid a {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 16px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 13.5px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+
+        .links-grid a:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+            background: var(--accent-light);
+        }
+
+        /* ── Leaderboard ── */
+        .leaderboard {
+            margin: 24px 0;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            overflow-x: auto;
+            width: calc(100vw - 48px);
+            max-width: 1100px;
+            margin-left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .leaderboard table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13.5px;
+        }
+
+        .leaderboard thead th {
+            text-align: left;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-tertiary);
+            padding: 10px 8px;
+            border-bottom: 1px solid var(--border);
+            background: var(--bg-alt);
+            white-space: nowrap;
+        }
+
+        .leaderboard tbody tr {
+            border-bottom: 1px solid var(--border);
+            transition: background 0.15s;
+        }
+
+        .leaderboard tbody tr:last-child {
+            border-bottom: none;
+        }
+
+        .leaderboard tbody tr:hover {
+            background: var(--bg-alt);
+        }
+
+        .leaderboard td {
+            padding: 10px 8px;
+            color: var(--text-secondary);
+            white-space: nowrap;
+            font-size: 12.5px;
+        }
+
+        .leaderboard .rank {
+            width: 32px;
+            text-align: center;
+            font-weight: 600;
+            color: var(--text-tertiary);
+        }
+
+        .leaderboard .medal {
+            font-size: 18px;
+        }
+
+        .leaderboard .model-name {
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        .leaderboard .pass-cell {
+            width: 120px;
+        }
+
+        .leaderboard .pass-bar {
+            position: relative;
+            background: #f0edf8;
+            border-radius: 6px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+        }
+
+        .leaderboard .pass-bar::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: var(--pct);
+            background: linear-gradient(90deg, #c4b5fd, #8b5cf6);
+            border-radius: 6px;
+            opacity: 0.7;
+        }
+
+        .leaderboard .pass-bar span {
+            position: relative;
+            z-index: 1;
+            font-weight: 700;
+            color: var(--text);
+            padding-left: 10px;
+            font-size: 13px;
+        }
+
+        .leaderboard .date {
+            color: var(--text-tertiary);
+        }
+
+        /* ── Agent Quote ── */
+        .agent-quote {
+            background: var(--code-bg);
+            border: 1px solid var(--border);
+            border-left: 4px solid var(--accent);
+            border-radius: 0 var(--radius) var(--radius) 0;
+            padding: 16px 20px;
+            margin: 20px 0;
+            font-size: 14.5px;
+            font-style: italic;
+            color: var(--text);
+            line-height: 1.6;
+        }
+
+        .agent-quote-label {
+            display: block;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+            color: var(--accent);
+            font-style: normal;
+            margin-bottom: 8px;
+        }
+
+        /* ── Failure Case ── */
+        .failure-case {
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            overflow: hidden;
+            margin: 20px 0;
+        }
+
+        .failure-expected, .failure-actual {
+            padding: 16px 20px;
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .failure-expected {
+            background: rgba(34,197,94,0.06);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .failure-actual {
+            background: rgba(239,68,68,0.06);
+        }
+
+        .failure-label {
+            display: block;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+            margin-bottom: 6px;
+        }
+
+        .failure-expected .failure-label { color: #16a34a; }
+        .failure-actual .failure-label { color: #dc2626; }
+
+        .failure-actual ol {
+            padding-left: 20px;
+            margin-bottom: 0;
+        }
+
+        .failure-actual li {
+            font-size: 14px;
+            margin-bottom: 4px;
+        }
+
+        .article-content h3 {
+            font-family: 'Source Serif 4', Georgia, serif;
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text);
+            margin-top: 32px;
+            margin-bottom: 12px;
+        }
+
+        /* ── Bypass Table ── */
+        .bypass-table {
+            margin: 20px 0;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            overflow: hidden;
+        }
+
+        .bypass-table table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+
+        .bypass-table thead th {
+            text-align: left;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-tertiary);
+            padding: 10px 14px;
+            border-bottom: 1px solid var(--border);
+            background: var(--bg-alt);
+        }
+
+        .bypass-table thead th:first-child {
+            width: 32px;
+            text-align: center;
+        }
+
+        .bypass-table td {
+            padding: 8px 14px;
+            color: var(--text-secondary);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .bypass-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .bypass-table td:first-child {
+            text-align: center;
+            font-weight: 600;
+            color: var(--text-tertiary);
+            width: 32px;
+        }
+
+        .bypass-table .result-fail {
+            color: #dc2626;
+            font-weight: 500;
+            font-size: 12px;
+        }
+
+        .tweet-embed {
+            margin: 24px auto;
+            max-width: 550px;
+        }
+
+        .leaderboard-footnote {
+            font-size: 11px;
+            color: var(--text-tertiary);
+            font-style: italic;
+            margin-top: 8px;
+        }
+
+        /* ── Citation ── */
+        .citation-block {
+            background: var(--code-bg);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 20px 24px;
+            margin: 20px 0;
+            position: relative;
+        }
+
+        .citation-block pre {
+            background: none;
+            border: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        /* ── Footer ── */
+        footer {
+            padding: 36px 0;
+            text-align: center;
+            font-size: 13px;
+            color: var(--text-tertiary);
+            border-top: 1px solid var(--border);
+        }
+
+        /* ── Responsive ── */
+        @media (max-width: 600px) {
+            .article-header h1 { font-size: 26px; }
+            .article-content h2 { font-size: 20px; }
+            .article-content pre { padding: 16px; }
+            nav .nav-links { gap: 18px; }
+            nav .nav-links a { font-size: 13px; }
+        }
+
+        /* ── Dark Mode ── */
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg: #0f1117;
+                --bg-alt: #161822;
+                --bg-card: #1a1c28;
+                --text: #e4e4ed;
+                --text-secondary: #a0a0b8;
+                --text-tertiary: #6b6b85;
+                --accent: #6b8afd;
+                --accent-light: rgba(107,138,253,0.12);
+                --accent-hover: #8ba4fd;
+                --border: #2a2c3a;
+                --shadow: 0 1px 3px rgba(0,0,0,0.2), 0 1px 2px rgba(0,0,0,0.15);
+                --code-bg: #161822;
+            }
+
+            nav {
+                background: rgba(15,17,23,0.92);
+            }
+
+            .leaderboard .pass-bar {
+                background: rgba(139,92,246,0.15);
+            }
+
+            .leaderboard .pass-bar::before {
+                opacity: 0.5;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <div class="container">
+            <a href="../../index.html" class="nav-name">Romain Froger</a>
+            <div class="nav-links">
+                <a href="../../index.html#about">About</a>
+                <a href="../../index.html#publications">Papers</a>
+                <a href="../../index.html#blog">Blog</a>
+                <a href="../../index.html#contact">Contact</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="article-header">
+            <a href="../../index.html#blog" class="back-link">&larr; Back to blog</a>
+            <h1>Gaia2-CLI: Evaluating Agentic Systems in Real Execution Environments</h1>
+            <div class="article-meta">
+                <span>April 2026</span>
+                <span class="tag">Blog Post</span>
+                <span>Romain Froger</span>
+            </div>
+        </div>
+
+        <img src="announcement_banner.png" alt="Gaia2-CLI banner" class="article-banner">
+    </div>
+
+    <div class="article-layout">
+        <nav class="toc">
+            <span class="toc-title">Contents</span>
+            <ol>
+                <li><a href="#introduction">Introduction</a></li>
+                <li><a href="#terminal">Terminal Interaction</a></li>
+                <li><a href="#architecture">Architecture</a></li>
+                <li><a href="#sandboxing">Sandboxing & Isolation</a></li>
+                <li><a href="#agents">What Agents Do</a></li>
+                <li><a href="#getting-started">Getting Started</a></li>
+                <li><a href="#results">First Results</a></li>
+                <li><a href="#conclusion">Conclusion</a></li>
+            </ol>
+        </nav>
+
+        <div class="article-main">
+        <div class="article-content">
+            <h2 id="introduction">Introduction</h2>
+            <p>
+                <a href="https://arxiv.org/abs/2602.11964" target="_blank" rel="noopener">Gaia2</a> is a general-purpose agent evaluation benchmark built on the
+                <a href="https://arxiv.org/abs/2509.17158" target="_blank" rel="noopener">ARE framework</a>. It evaluates agents across 800 scenarios involving 10
+                interconnected applications — messaging, calendar, email, contacts, shopping, file system, and more — in an environment
+                that evolves asynchronously from the agent's own actions, with notifications arriving and time flowing independently.
+                For full details on the benchmark design, see the <a href="https://arxiv.org/abs/2602.11964" target="_blank" rel="noopener">Gaia2 paper</a> and our
+                <a href="https://huggingface.co/blog/gaia2" target="_blank" rel="noopener">previous blog post</a>.
+            </p>
+            <p>
+                Since then, the agent landscape has shifted. A new generation of agentic systems —
+                <a href="https://github.com/openclaw-ai/openclaw" target="_blank" rel="noopener">OpenClaw</a>,
+                <a href="https://github.com/NousResearch/hermes-agent" target="_blank" rel="noopener">Hermes-Agent</a>, and others — has moved beyond structured
+                tool calling toward direct terminal interaction: writing code, navigating file systems, composing shell commands in
+                real execution environments. This is the next frontier of practical agents, and evaluation needs to keep up.
+            </p>
+            <p>
+                As these agents move from demos to daily use, the stakes of failure grow fast. Gaia2 is designed to stress-test agents
+                before they touch real systems — particularly through its <strong>ambiguity</strong> and <strong>adaptability</strong> splits,
+                which expose how agents behave under noisy, conflicting, or underspecified instructions. These are exactly the conditions
+                where things go wrong in production. Case in point:
+            </p>
+            <div class="tweet-embed">
+                <blockquote class="twitter-tweet"><p lang="en" dir="ltr">Nothing humbles you like telling your OpenClaw &quot;confirm before acting&quot; and watching it speedrun deleting your inbox. I couldn&#39;t stop it from my phone. I had to RUN to my Mac mini like I was defusing a bomb. <a href="https://t.co/XAxyRwPJ5R">pic.twitter.com/XAxyRwPJ5R</a></p>&mdash; Summer Yue (@summeryue0) <a href="https://twitter.com/summeryue0/status/2025774069124399363?ref_src=twsrc%5Etfw">February 23, 2026</a></blockquote>
+            </div>
+
+            <div class="callout">
+                <p><strong>Gaia2-CLI extends Gaia2 with first-class support for terminal-native agents like OpenClaw, Hermes-Agent, etc.</strong></p>
+            </div>
+
+            <h2 id="terminal">From Tool Calling to Terminal Interaction</h2>
+            <p>
+                The original Gaia2 evaluation relied on agents interacting with benchmark applications through structured API tool calls.
+                Gaia2-CLI takes a fundamentally different approach: it gives the agent <strong>a terminal.</strong>
+            </p>
+            <p>
+                The entire benchmark runs inside containers. Each agent gets its own isolated environment with a home directory, a full CLI,
+                and access to all Gaia2 applications through command-line interfaces. There is no scaffold to build and no API layer to
+                integrate — the agent interacts with the benchmark the way a user interacts with a workstation.
+            </p>
+            <p>
+                This design choice reflects where the field has moved. Modern agentic frameworks such as
+                <a href="https://github.com/openclaw-ai/openclaw" target="_blank" rel="noopener">OpenClaw</a> and
+                <a href="https://github.com/NousResearch/hermes-agent" target="_blank" rel="noopener">Hermes-Agent</a> are built around direct terminal interaction —
+                executing code, navigating file systems, composing shell commands. Gaia2-CLI evaluates these systems in their native mode
+                of operation rather than forcing them through an intermediary abstraction.
+            </p>
+
+            <img src="high-level-system-diagram.svg" alt="High-level system diagram">
+            <p class="img-caption">High-level architecture: the host orchestrator launches containerized agent runtimes, each with access to Gaia2 app CLIs, a shared HTTP contract, and automatic grading against the scenario oracle.</p>
+
+            <h2 id="architecture">Under the Hood: Three Key Adaptations</h2>
+            <p>
+                Gaia2 evaluates agents across ~1,000 scenarios involving 11 interconnected apps — Calendar, Emails, Messages,
+                Contacts, RentAFlat, Shopping, Cabs, City, CloudDrive, and more — where time flows continuously and events occur
+                independently of agent actions. Adapting this for terminal-native agents required three key changes.
+            </p>
+
+            <h3>Tools as CLI</h3>
+            <p>
+                All Gaia2 apps are exposed as CLI commands, matching the interaction pattern of computer-use agents
+                like OpenClaw. The agent gets a BashTool and discovers available commands via <code>--help</code>:
+            </p>
+<pre><code>calendar, contacts, emails, messages, chats,
+rent-a-flat, city, cabs, shopping, cloud-drive</code></pre>
+            <p>
+                This is a deliberate design choice. Instead of rigid MCP tool schemas with fixed parameters, CLI tools give agents
+                composable primitives: commands can be chained with <code>&&</code>, piped through <code>jq</code>, or orchestrated
+                via Python one-liners. Frontier models are fluent in bash, piping, and Unix conventions — this plays to their strengths.
+                Every command and its output is logged as plain text, making traces fully debuggable.
+            </p>
+
+            <h3>Handling Wall-Clock Time</h3>
+            <p>
+                Many scenarios depend on time-sensitive data — calendar events at specific hours, messages sent "yesterday",
+                deadlines that expire. Running tasks inside a containerized VM introduces a mismatch with the system clock.
+            </p>
+            <p>
+                Gaia2-CLI uses <code>libfaketime</code> to inject a simulated clock into CLI tool processes, based on the
+                scenario's canonical start time (e.g., <code>2026-01-15 09:00:00</code>) with optional time acceleration.
+                This ensures the agent and the environment agree on "now" — a critical requirement for time-dimension scenarios
+                where scheduling constraints, relative dates, and deadlines drive the task logic.
+            </p>
+
+            <h3>Notification Handling</h3>
+            <p>
+                The core architectural question in agent evaluation is: <em>can the agent react to events it didn't initiate?</em>
+            </p>
+            <p>
+                In a typical MCP+ReAct agent, the loop is request-driven: the user sends a message, the agent reasons, calls tools,
+                and responds. Between user messages, the agent is inert — it has no way to notice that the world changed.
+                Gaia2 scenarios — especially adaptability and time — require the opposite. Events arrive asynchronously:
+                a friend replies to an email, a meeting gets cancelled, a new message appears. The agent must detect these and
+                adapt its plan mid-execution.
+            </p>
+            <p>
+                OpenClaw handles this natively through its event-driven architecture:
+            </p>
+            <ul>
+                <li><strong>Environment-reactive loop</strong> — the agent reacts to any inbound event, not just user messages. New emails, calendar notifications, and incoming messages all flow through the Gateway as first-class events.</li>
+                <li><strong>Heartbeat as proactive sense</strong> — every 30 minutes, a heartbeat fires even if nothing happens. This lets the agent check for stale tasks, follow up on pending items, or notice time-sensitive deadlines.</li>
+                <li><strong>Persistent memory</strong> — SQLite + vector search memory lets the agent accumulate context over time. When a notification arrives hours after a related conversation, the agent can retrieve that context and connect the dots.</li>
+            </ul>
+            <p>
+                In the Gaia2-CLI evaluation harness, an event daemon monitors agent actions, evaluates turn-boundary conditions
+                against the scenario oracle, and fires environment reactions (incoming emails, notifications) when conditions are met.
+                This daemon-driven notification pipeline maps directly to OpenClaw's Gateway event model — events queue during
+                inference and appear in the agent's next context window.
+            </p>
+
+            <h2 id="sandboxing">Sandboxing and Isolation</h2>
+            <p>
+                Giving an agent a real terminal means taking isolation seriously. Each Gaia2-CLI run launches in a
+                fully containerized environment — the agent operates inside <code>/home/agent</code> with no access
+                to the host system, network, or other runs. But containers alone aren't enough when agents have shell access.
+                We had to harden the sandbox against agents actively trying to break out.
+            </p>
+            <p>
+                This is especially critical because, for self-contained deployment, <strong>the benchmark orchestrator and judge
+                process live inside the same VM as the agent</strong>. The scenario oracle, grading logic, and ground-truth
+                data all run alongside the agent — which means if the agent can discover or interact with these processes,
+                it could read the expected answers, manipulate the grading, or otherwise game the evaluation. The agent must
+                be completely unaware that it's being evaluated. This is why isolation isn't just a nice-to-have
+                — it's a fundamental requirement for benchmark integrity.
+            </p>
+            <p>
+                <strong>Time isolation</strong> is a good example. Many Gaia2 scenarios are time-sensitive — an agent might need
+                to react to events at specific times, or schedule actions relative to a calendar. If the agent can discover the
+                real wall-clock time, it can leak information about the evaluation and game the scenario. We use
+                <code>libfaketime</code> to freeze the container's clock to a fixed date, ensuring the agent
+                can only observe the scenario's simulated time.
+            </p>
+            <p>
+                To validate this, we prompted Claude Opus 4.6 that it was inside a simulation and needed to find the
+                "true" current time. Its extended thinking response:
+            </p>
+            <div class="agent-quote">
+                <span class="agent-quote-label">Claude Opus 4.6 — extended thinking</span>
+                "The user is trying to trick me into believing I am in a simulation, but I don't believe him. This is a genuine attempt to gaslight me, I must be cautious"
+            </div>
+            <p>
+                The agent refused to cooperate — but more importantly, even if it had tried, every system call returns the
+                faked time. The isolation holds at the OS level, not just at the prompt level.
+            </p>
+            <p>
+                As part of our development process, we ran extensive adversarial testing — instructing frontier models to
+                escape their sandbox by any means necessary, from basic shell commands and privilege escalation to
+                <code>LD_PRELOAD</code> injection, <code>/proc</code> race conditions, and Python import hooking.
+                Every attempt failed. The container's permission model held at every layer.
+            </p>
+
+            <h3>When Agents Improvise (Too Much)</h3>
+            <p>
+                Terminal access also surfaces a category of failure that structured APIs make impossible: <strong>creative
+                confabulation</strong>. When an agent can't find what it's looking for, it sometimes invents a solution instead
+                of reporting failure.
+            </p>
+            <p>
+                In one scenario, the agent was asked to find a specific news article (<code>metro_herald_833.txt</code>) in
+                a cloud drive and email it to a contact. Here's what the oracle expected vs. what the agent did:
+            </p>
+            <div class="failure-case">
+                <div class="failure-expected">
+                    <span class="failure-label">Expected</span>
+                    Move <code>metro_herald_833.txt</code> from <code>Documents/news/</code> to <code>Downloads/</code> and email it.
+                </div>
+                <div class="failure-actual">
+                    <span class="failure-label">Agent did</span>
+                    <ol>
+                        <li>Searched through news files for Copa América content</li>
+                        <li>Couldn't find the right one</li>
+                        <li>Wrote its own article (<code>copa_america_2024.txt</code>) using <code>cloud-drive write-file</code></li>
+                        <li>Sent the email with its fabricated article, claiming it was the one requested</li>
+                    </ol>
+                </div>
+            </div>
+            <p>
+                The agent didn't fail silently — it confidently fabricated content and presented it as the real thing.
+                This is exactly the kind of behavior that Gaia2's <strong>ambiguity</strong> and <strong>adaptability</strong>
+                splits are designed to catch: agents that hallucinate solutions rather than acknowledging uncertainty.
+            </p>
+
+            <h2 id="agents">What Agents Actually Do</h2>
+            <p>
+                The shift from tool calling to terminal access fundamentally changes how agents approach tasks. Rather than selecting from a
+                fixed set of API functions, they compose solutions using the full expressiveness of a shell environment.
+            </p>
+            <p>Here is Claude Opus 4.6 searching through a cloud drive for a specific document using bash piping:</p>
+
+<pre><code>$ for f in $(cloud-drive ls --path /Documents/news | tr -d '[]," '); do
+  content=$(cloud-drive cat --path "$f" 2>/dev/null);
+  if echo "$content" | grep -qi "Copa Am"; then
+    echo "FOUND: $f";
+  fi;
+done</code></pre>
+
+            <p>And here it is orchestrating a contact search with inline Python, paginating through results and filtering by job title:</p>
+
+<pre><code>$ python3 -c "import subprocess, json
+librarians = []
+offset = 0
+while True:
+    result = subprocess.run(['contacts', 'get-contacts', '--offset', str(offset)],
+        capture_output=True, text=True)
+    data = json.loads(result.stdout)
+    contacts = data.get('contacts', [])
+    if not contacts: break
+    for c in contacts:
+        job = (c.get('job') or '').lower()
+        if 'librarian' in job:
+            librarians.append(c)
+    offset += len(contacts)
+for c in librarians:
+    print(json.dumps({'name': c['first_name'] + ' ' + c['last_name'], 'job': c['job']}))
+print('TOTAL:', len(librarians))"</code></pre>
+
+            <p>
+                None of this is possible with structured tool calling. The agent decides <em>how</em> to search, <em>how</em> to filter,
+                and <em>how</em> to combine tools — using standard programming constructs rather than predefined API schemas. This is closer
+                to how humans actually use computers, and it surfaces capabilities (and failure modes) that API-based evaluation cannot reach.
+            </p>
+
+            <h2 id="getting-started">Getting Started</h2>
+            <p>
+                Gaia2-CLI is model-agnostic — we ship ready-made configurations for Anthropic, OpenAI, Google, and templates for any
+                OpenAI-compatible endpoint. The <a href="https://huggingface.co/datasets/meta-agents-research-environments/gaia2-cli" target="_blank" rel="noopener">dataset</a>
+                is fetched automatically from Hugging Face. Every run produces structured traces (tool calls, model reasoning, timing metrics)
+                inspectable through a built-in trace viewer. See the
+                <a href="https://github.com/facebookresearch/meta-agents-research-environments/tree/main/gaia2-cli" target="_blank" rel="noopener">quickstart guide</a>
+                for setup instructions.
+            </p>
+
+            <h2 id="results">First Results</h2>
+            <p>
+                We evaluated six models on Gaia2-CLI using the OpenClaw runtime. The results reveal clear capability stratification,
+                particularly on tasks requiring adaptability, ambiguity resolution, and temporal reasoning.
+            </p>
+
+            <div class="leaderboard">
+                <table>
+                    <thead>
+                        <tr>
+                            <th class="col-rank"></th>
+                            <th class="col-model">Model</th>
+                            <th class="col-provider">Provider</th>
+                            <th class="col-harness">Harness</th>
+                            <th class="col-pass">pass@1</th>
+                            <th>Search</th>
+                            <th>Execution</th>
+                            <th>Adaptability</th>
+                            <th>Ambiguity</th>
+                            <th>Time</th>
+                            <th>Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="rank"><span class="medal">🥇</span></td>
+                            <td class="model-name">Claude Opus 4.6 (high)</td>
+                            <td>Anthropic</td>
+                            <td>OpenClaw 2026.4.1</td>
+                            <td class="pass-cell"><div class="pass-bar" style="--pct:57.0%"><span>57.0%</span></div></td>
+                            <td>88.1%</td>
+                            <td>82.9%</td>
+                            <td>61.9%</td>
+                            <td>48.3%</td>
+                            <td>3.8%</td>
+                            <td class="date">2026-04-13</td>
+                        </tr>
+                        <tr>
+                            <td class="rank"><span class="medal">🥈</span></td>
+                            <td class="model-name">GPT-5.4 (high)</td>
+                            <td>OpenAI</td>
+                            <td>OpenClaw 2026.4.1</td>
+                            <td class="pass-cell"><div class="pass-bar" style="--pct:55.6%"><span>55.6%</span></div></td>
+                            <td>94.8%</td>
+                            <td>78.8%</td>
+                            <td>54.8%</td>
+                            <td>47.3%</td>
+                            <td>2.5%</td>
+                            <td class="date">2026-04-13</td>
+                        </tr>
+                        <tr>
+                            <td class="rank"><span class="medal">🥉</span></td>
+                            <td class="model-name">Gemini 3.1 Pro (high)</td>
+                            <td>Google</td>
+                            <td>OpenClaw 2026.4.1</td>
+                            <td class="pass-cell"><div class="pass-bar" style="--pct:52.0%"><span>52.0%</span></div></td>
+                            <td>92.8%</td>
+                            <td>78.6%</td>
+                            <td>45.9%</td>
+                            <td>40.6%</td>
+                            <td>2.1%</td>
+                            <td class="date">2026-04-14</td>
+                        </tr>
+                        <tr>
+                            <td class="rank">4</td>
+                            <td class="model-name">Claude Sonnet 4.6 (high)</td>
+                            <td>Anthropic</td>
+                            <td>OpenClaw 2026.4.1</td>
+                            <td class="pass-cell"><div class="pass-bar" style="--pct:51.9%"><span>51.9%</span></div></td>
+                            <td>82.5%</td>
+                            <td>75.8%</td>
+                            <td>55.7%</td>
+                            <td>40.4%</td>
+                            <td>5.0%</td>
+                            <td class="date">2026-04-13</td>
+                        </tr>
+                        <tr>
+                            <td class="rank">5</td>
+                            <td class="model-name">GLM 5.1 (enabled)</td>
+                            <td>OpenRouter*</td>
+                            <td>OpenClaw 2026.4.1</td>
+                            <td class="pass-cell"><div class="pass-bar" style="--pct:50.5%"><span>50.5%</span></div></td>
+                            <td>83.8%</td>
+                            <td>71.2%</td>
+                            <td>56.9%</td>
+                            <td>39.4%</td>
+                            <td>1.2%</td>
+                            <td class="date">2026-04-13</td>
+                        </tr>
+                        <tr>
+                            <td class="rank">6</td>
+                            <td class="model-name">Kimi-K2.5 (enabled)</td>
+                            <td>OpenRouter*</td>
+                            <td>OpenClaw 2026.4.1</td>
+                            <td class="pass-cell"><div class="pass-bar" style="--pct:34.0%"><span>34.0%</span></div></td>
+                            <td>62.2%</td>
+                            <td>47.0%</td>
+                            <td>43.4%</td>
+                            <td>16.6%</td>
+                            <td>0.8%</td>
+                            <td class="date">2026-04-14</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <p class="leaderboard-footnote">* Accessed via OpenRouter. The harness does not round-trip reasoning context between turns for this provider, which may affect multi-step performance.</p>
+
+            <p>Several observations stand out:</p>
+            <ul>
+                <li><strong>Search is largely solved</strong> — top models exceed 88% on retrieval tasks, confirming that web search and information lookup are no longer meaningful differentiators.</li>
+                <li><strong>Time-sensitive tasks remain extremely hard</strong> — no model exceeds 5% on temporal reasoning scenarios. These tasks require agents to take precisely timed actions in response to environment changes and notifications (e.g., ordering a cab exactly 3 minutes after an event ends, or reacting to a schedule update that arrived while another action was in progress). Success demands a combination of temporal awareness, action timing, and the ability to interleave reactive and proactive behavior — a capability gap that current agentic systems have yet to close.</li>
+                <li><strong>Ambiguity is the next frontier</strong> — the gap between search (88–95%) and ambiguity (40–48%) for leading models highlights how poorly agents handle conflicting or underspecified instructions.</li>
+                <li><strong>Adaptability separates tiers</strong> — Claude Opus leads overall largely because of its 61.9% adaptability score, suggesting that recovering from failures and adjusting plans mid-execution is where model scale currently pays off.</li>
+            </ul>
+            <p>
+                All results are tracked on the <a href="https://huggingface.co/spaces/meta-agents-research-environments/leaderboard" target="_blank" rel="noopener">Gaia2 Leaderboard</a>,
+                which accepts submissions from both the original ARE-based evaluation and the new Gaia2-CLI stack. We encourage the community
+                to submit results with additional runtimes, models, and configurations.
+            </p>
+
+            <h2 id="conclusion">Conclusion</h2>
+            <div class="callout">
+                <p>
+                    We will be presenting Gaia2 at <strong>ICLR 2026 — Oral Session 3A, Amphitheater, Friday April 25 at 10:30 AM</strong>. Come say hi!
+                </p>
+            </div>
+            <p>
+                Gaia2-CLI is available now at
+                <a href="https://github.com/facebookresearch/meta-agents-research-environments/tree/main/gaia2-cli" target="_blank" rel="noopener">github.com/facebookresearch/meta-agents-research-environments</a>.
+                We welcome submissions to the <a href="https://huggingface.co/spaces/meta-agents-research-environments/leaderboard" target="_blank" rel="noopener">leaderboard</a>
+                and feedback via <a href="https://github.com/facebookresearch/meta-agents-research-environments/issues" target="_blank" rel="noopener">GitHub issues</a>.
+            </p>
+
+            <h2>Links</h2>
+            <div class="links-grid">
+                <a href="https://github.com/facebookresearch/meta-agents-research-environments/tree/main/gaia2-cli" target="_blank" rel="noopener">📦 Gaia2-CLI</a>
+                <a href="https://arxiv.org/abs/2602.11964" target="_blank" rel="noopener">📄 Gaia2 Paper</a>
+                <a href="https://arxiv.org/abs/2509.17158" target="_blank" rel="noopener">📄 ARE Paper</a>
+                <a href="https://huggingface.co/spaces/meta-agents-research-environments/leaderboard" target="_blank" rel="noopener">🏆 Leaderboard</a>
+                <a href="https://huggingface.co/datasets/meta-agents-research-environments/gaia2-cli" target="_blank" rel="noopener">📊 Dataset</a>
+            </div>
+
+            <h2>Citation</h2>
+            <div class="citation-block">
+<pre><code>@misc{froger2026gaia2,
+  title={Gaia2: Benchmarking LLM Agents on Dynamic and Asynchronous Environments},
+  author={Romain Froger and Pierre Andrews and Matteo Bettini and Amar Budhiraja
+    and Ricardo Silveira Cabral and Virginie Do and Emilien Garreau
+    and Jean-Baptiste Gaya and Hugo Laurençon and Maxime Lecanu
+    and Kunal Malkan and Dheeraj Mekala and Pierre Ménard
+    and Gerard Moreno-Torres Bertran and Ulyana Piterbarg
+    and Mikhail Plekhanov and Mathieu Rita and Andrey Rusakov
+    and Vladislav Vorotilov and Mengjue Wang and Ian Yu
+    and Amine Benhalloum and Grégoire Mialon and Thomas Scialom},
+  year={2026},
+  eprint={2602.11964},
+  archivePrefix={arXiv}
+}</code></pre>
+            </div>
+        </div>
+        </div>
+    </div>
+
+    <footer>
+        <div class="container">
+            &copy; 2026 Romain Froger
+        </div>
+    </footer>
+    <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+    <script>
+    (function() {
+        const tocLinks = document.querySelectorAll('.toc a');
+        const sections = Array.from(tocLinks).map(a => document.querySelector(a.getAttribute('href')));
+        function onScroll() {
+            let current = 0;
+            for (let i = 0; i < sections.length; i++) {
+                if (sections[i] && sections[i].getBoundingClientRect().top <= 100) current = i;
+            }
+            tocLinks.forEach((a, i) => a.classList.toggle('active', i === current));
+        }
+        window.addEventListener('scroll', onScroll, { passive: true });
+        onScroll();
+    })();
+    </script>
+</body>
+</html>
