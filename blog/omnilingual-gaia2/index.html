@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OmnilingualGAIA2: Evaluating AI Agents Across Ten Languages | Romain Froger</title>
+    <meta name="description" content="OmnilingualGAIA2 machine-translates four GAIA2 capabilities into ten languages and evaluates seven AI agents, revealing pass@3 gaps of 8.8 to 18.4 points.">
+    <link rel="canonical" href="https://romainfrog.github.io/blog/omnilingual-gaia2/">
+    <meta property="og:title" content="OmnilingualGAIA2: Evaluating AI Agents Across Ten Languages">
+    <meta property="og:description" content="A machine-translated expansion of four GAIA2 capabilities, evaluating seven AI agents across ten languages beyond English.">
+    <meta property="og:type" content="article">
+    <meta property="og:site_name" content="Romain Froger">
+    <meta property="og:url" content="https://romainfrog.github.io/blog/omnilingual-gaia2/">
+    <meta property="og:image" content="https://romainfrog.github.io/blog/omnilingual-gaia2/social-card.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="If an agent is meant for the world, it should be evaluated in the languages of the world">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="OmnilingualGAIA2: Evaluating AI Agents Across Ten Languages">
+    <meta name="twitter:description" content="A machine-translated expansion of four GAIA2 capabilities, evaluating seven AI agents across ten languages beyond English.">
+    <meta name="twitter:image" content="https://romainfrog.github.io/blog/omnilingual-gaia2/social-card.png">
+    <meta name="twitter:image:alt" content="If an agent is meant for the world, it should be evaluated in the languages of the world">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌍</text></svg>">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Source+Serif+4:ital,wght@0,500;0,600;0,700;1,400&amp;family=Fira+Code:wght@400;500&amp;display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../../styles.css">
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "BlogPosting",
+      "headline": "OmnilingualGAIA2: Evaluating AI Agents Across Ten Languages",
+      "datePublished": "2026-08-12",
+      "author": {"@type": "Person", "name": "Romain Froger"},
+      "image": "https://romainfrog.github.io/blog/omnilingual-gaia2/social-card.png",
+      "mainEntityOfPage": "https://romainfrog.github.io/blog/omnilingual-gaia2/"
+    }
+    </script>
+</head>
+<body>
+    <a class="skip-link" href="#main-content">Skip to main content</a>
+    <nav class="site-nav" aria-label="Primary">
+        <div class="container">
+            <a href="../../" class="nav-name">Romain Froger</a>
+            <div class="nav-links">
+                <a href="../../#about">About</a>
+                <a href="../../#publications">Papers</a>
+                <a href="../../#blog">Blog</a>
+                <a href="../../#contact">Contact</a>
+            </div>
+        </div>
+    </nav>
+
+    <main id="main-content" tabindex="-1">
+        <header class="container article-header omni-header">
+            <a href="../../#blog" class="back-link">&larr; Back to blog</a>
+            <h1>OmnilingualGAIA2: Evaluating AI Agents Across Ten Languages</h1>
+            <p class="article-deck">If an agent is meant for the world, it should be evaluated in the languages of the world.</p>
+            <div class="article-meta">
+                <time datetime="2026-08-12">August 2026</time>
+                <span class="tag">Blog Post</span>
+                <span>Romain Froger</span>
+            </div>
+        </header>
+
+        <div class="container omni-banner-wrap">
+            <img src="announcement-banner.svg" alt="" aria-hidden="true" class="article-banner" width="1200" height="630" fetchpriority="high">
+        </div>
+
+        <div class="container mobile-toc-wrap">
+            <nav class="mobile-toc" aria-label="Article contents">
+                <details>
+                    <summary>On this page</summary>
+                    <ol>
+                        <li><a href="#introduction">English by default</a></li>
+                        <li><a href="#benchmark">The benchmark</a></li>
+                        <li><a href="#protocol">Evaluation protocol</a></li>
+                        <li><a href="#results">The result</a></li>
+                        <li><a href="#failures">What breaks</a></li>
+                        <li><a href="#attribution">Is translation to blame?</a></li>
+                        <li><a href="#language">Language changes the task</a></li>
+                        <li><a href="#limitations">Limitations</a></li>
+                        <li><a href="#conclusion">What this means</a></li>
+                    </ol>
+                </details>
+            </nav>
+        </div>
+
+        <div class="article-layout">
+        <nav class="toc" aria-label="Article contents">
+            <span class="toc-title">Contents</span>
+            <ol>
+                <li><a href="#introduction">English by default</a></li>
+                <li><a href="#benchmark">The benchmark</a></li>
+                <li><a href="#protocol">Evaluation protocol</a></li>
+                <li><a href="#results">The result</a></li>
+                <li><a href="#failures">What breaks</a></li>
+                <li><a href="#attribution">Is translation to blame?</a></li>
+                <li><a href="#language">Language changes the task</a></li>
+                <li><a href="#limitations">Limitations</a></li>
+                <li><a href="#conclusion">What this means</a></li>
+            </ol>
+        </nav>
+
+        <article class="article-main">
+        <div class="article-content">
+            <h2 id="introduction">We usually measure agents in English</h2>
+            <p class="section-lead">
+                When we say an AI agent can manage an inbox, compare apartments, or update a calendar, we almost always mean that it can do those things in English.
+            </p>
+            <p>
+                We wanted to see what happens when the language changes and the intended task stays the same. An agent still has to understand the request, keep track of its goal, use the right tools, and know when to ask a question. Any misunderstanding can affect every action that follows.
+            </p>
+            <p>
+                Our new paper, <a href="https://arxiv.org/abs/2608.08775" target="_blank" rel="noopener"><strong>OmnilingualGAIA2: Evaluating the Multilingual Gap in Frontier AI Agents</strong></a>, measures how well these abilities transfer from English to ten other languages.
+            </p>
+
+            <div class="callout omni-callout">
+                <span class="callout-eyebrow">The short answer</span>
+                <p>For all seven agents, <strong>mean pass@3 across the ten target languages was below the English score</strong>. The pooled gap ranged from <strong>8.8 to 18.4 percentage points</strong>.</p>
+            </div>
+
+            <h2 id="benchmark">Four GAIA2 capabilities, in ten more languages</h2>
+            <p>
+                OmnilingualGAIA2 builds on <a href="https://arxiv.org/abs/2602.11964" target="_blank" rel="noopener">GAIA2</a>. In GAIA2, an agent works inside a simulated digital life. It can use email, messages, contacts, calendars, shops, cabs, cloud files, housing services, and city information. These apps share data, and the environment can change while the agent is working.
+            </p>
+            <p>
+                We machine-translated four of GAIA2's seven capability splits into Spanish, German, French, Italian, Portuguese, Indonesian, Turkish, Mandarin Chinese, Japanese, and Hindi. Time, Noise, and Agent2Agent remain out of scope because they require translation or verifier paths not covered by this release. We focused on four abilities that remain difficult even in English:
+            </p>
+
+            <div class="capability-cards">
+                <div class="capability-card"><span>01</span><strong>Search</strong><p>Retrieve and combine information across apps.</p></div>
+                <div class="capability-card"><span>02</span><strong>Execution</strong><p>Turn a request into the correct sequence of actions.</p></div>
+                <div class="capability-card"><span>03</span><strong>Adaptability</strong><p>Revise a plan when the environment changes.</p></div>
+                <div class="capability-card"><span>04</span><strong>Ambiguity</strong><p>Recognise missing or conflicting information.</p></div>
+            </div>
+
+            <h3>The difficult part is consistency</h3>
+            <p>
+                This is not a collection of questions with short answers. A person, event, or product can appear in the request, in several apps, and in the expected result. If its name changes between those places, the task may become impossible even though each sentence looks fine on its own.
+            </p>
+
+            <figure class="figure-wide adaptive-figure">
+                <div class="pipeline-visual" role="img" aria-label="Three step translation pipeline: translate app data, build a shared terminology table, then translate prompts and oracle text while keeping executable identifiers unchanged">
+                    <div class="viz-heading">
+                        <strong>Translation pipeline</strong>
+                        <span>Natural language is translated while executable structure remains fixed.</span>
+                    </div>
+                    <div class="pipeline-steps">
+                        <div class="pipeline-step">
+                            <span class="step-number">(a)</span>
+                            <strong>Translate the universe</strong>
+                            <small>Natural language fields are grouped by app.</small>
+                            <div class="app-fields"><span>Email</span><span>Calendar</span><span>Messages</span></div>
+                        </div>
+                        <span class="pipeline-arrow" aria-hidden="true">→</span>
+                        <div class="pipeline-step">
+                            <span class="step-number violet">(b)</span>
+                            <strong>Lock shared terms</strong>
+                            <small>Recurring entities get one translation.</small>
+                            <div class="term-pair"><span>Amazing Discount</span><b>→</b><span>Sconto Incredibile</span></div>
+                        </div>
+                        <span class="pipeline-arrow" aria-hidden="true">→</span>
+                        <div class="pipeline-step">
+                            <span class="step-number cyan">(c)</span>
+                            <strong>Assemble the task</strong>
+                            <small>The same terms are used in the request and expected answer.</small>
+                            <div class="translated-fields"><span>User task</span><span>Oracle text</span></div>
+                        </div>
+                    </div>
+                    <div class="frozen-strip"><strong>Fixed fields</strong><span>IDs</span><span>timestamps</span><span>tool names</span><span>executable structure</span></div>
+                </div>
+                <figcaption>We translate the language, but keep IDs, timestamps, tool names, and executable structure unchanged.</figcaption>
+            </figure>
+
+            <p>
+                Our pipeline has three steps. It first translates the text stored in each app. It then builds a shared table for recurring names and terms. Finally, it uses that table while translating the request and the expected answer. In a head-to-head evaluation of the two shortlisted open-weight translators, Gemma 4 31B Instruct outperformed Qwen 3.6 27B in all ten languages. A second-model review pass produced no statistically measurable quality improvement, so we left it out.
+            </p>
+            <p>
+                We also adapted the verifier instead of assuming that an English judge would work unchanged. We rewrote its prompts and checked the GPT-OSS-120B judge against human annotations. On the <strong>153 calibration traces whose verdict invokes an LLM checker</strong>, agreement with the fixed human-majority label ranges from <strong>κ = 0.886 to 0.971</strong> across the eleven language versions. This measures the language-sensitive part of the verifier; most remaining checks are deterministic.
+            </p>
+
+            <h2 id="protocol">How we evaluated the agents</h2>
+            <p>
+                Each capability–language cell contains <strong>160 matched scenarios</strong>. We run each scenario three times and report <strong>pass@3</strong>: a scenario is counted as solved if at least one valid run passes the verifier. The headline score averages the four capabilities, and the multilingual score pools the ten target languages. The paper also reports pass@1, all-three-run consistency, Wilson 95% confidence intervals, and paired McNemar tests against English.
+            </p>
+            <h3>How this relates to other multilingual agent benchmarks</h3>
+            <p>
+                OmnilingualGAIA2 complements multilingual web navigation and tool-use evaluations such as X-WebAgentBench, SEATauBench, MLCL, MAPS, PolyWorkBench, and GAIA-v2-LILT. Its specific contribution is to preserve GAIA2's executable task structure across ten languages, evaluate a heterogeneous seven-agent cohort with a shared calibrated verifier, and separate model failures from translation and verifier effects. The paper's related-work section gives the full comparison.
+            </p>
+
+            <h2 id="results">Every agent shows a pooled multilingual gap</h2>
+            <p>
+                We tested Claude 4.7 Opus, GPT-5.4, Gemini 3.1 Pro, Kimi 2.6, Gemma 4 31B Instruct, and two Qwen 3.6 variants. For every one of them, the average over the ten translated languages is lower than the English score. This pooled statement should not be read as saying that every individual language–capability cell is significantly worse.
+            </p>
+
+            <figure class="figure-wide adaptive-figure">
+                <div class="gap-visual" role="img" aria-label="English versus ten-language mean pass at 3. Claude: 82.7 versus 73.6. GPT-5.4: 68.4 versus 58.5. Gemini: 62.2 versus 53.4. Kimi: 66.5 versus 54.2. Gemma: 63.3 versus 51.4. Qwen 27B: 62.2 versus 50.2. Qwen 35B-A3B: 56.6 versus 38.2.">
+                    <div class="viz-heading split-heading">
+                        <div><strong>Pass@3 by model and language setting</strong><span>Mean across execution, search, adaptability, and ambiguity</span></div>
+                        <div class="viz-legend"><span><i class="legend-dot english"></i>English</span><span><i class="legend-dot target"></i>10-language mean</span></div>
+                    </div>
+                    <div class="gap-axis" aria-hidden="true"><span></span><div><span>35</span><span>45</span><span>55</span><span>65</span><span>75</span><span>85</span></div><span></span></div>
+                    <div class="gap-row" style="--target:77.2%; --english:95.4%"><strong>Claude 4.7 Opus</strong><div class="gap-track"><i class="gap-line"></i><i class="gap-point target" data-value="73.6"></i><i class="gap-point english" data-value="82.7"></i></div><b>−9.1 pp</b></div>
+                    <div class="gap-row" style="--target:47%; --english:66.8%"><strong>GPT-5.4</strong><div class="gap-track"><i class="gap-line"></i><i class="gap-point target" data-value="58.5"></i><i class="gap-point english" data-value="68.4"></i></div><b>−9.9 pp</b></div>
+                    <div class="gap-row" style="--target:36.8%; --english:54.4%"><strong>Gemini 3.1 Pro</strong><div class="gap-track"><i class="gap-line"></i><i class="gap-point target" data-value="53.4"></i><i class="gap-point english" data-value="62.2"></i></div><b>−8.8 pp</b></div>
+                    <div class="gap-row" style="--target:38.4%; --english:63%"><strong>Kimi 2.6</strong><div class="gap-track"><i class="gap-line"></i><i class="gap-point target" data-value="54.2"></i><i class="gap-point english" data-value="66.5"></i></div><b>−12.3 pp</b></div>
+                    <div class="gap-row" style="--target:32.8%; --english:56.6%"><strong>Gemma 4 31B</strong><div class="gap-track"><i class="gap-line"></i><i class="gap-point target" data-value="51.4"></i><i class="gap-point english" data-value="63.3"></i></div><b>−11.9 pp</b></div>
+                    <div class="gap-row" style="--target:30.4%; --english:54.4%"><strong>Qwen 3.6 27B</strong><div class="gap-track"><i class="gap-line"></i><i class="gap-point target" data-value="50.2"></i><i class="gap-point english" data-value="62.2"></i></div><b>−12.0 pp</b></div>
+                    <div class="gap-row" style="--target:6.4%; --english:43.2%"><strong>Qwen 3.6 35B-A3B</strong><div class="gap-track"><i class="gap-line"></i><i class="gap-point target" data-value="38.2"></i><i class="gap-point english" data-value="56.6"></i></div><b>−18.4 pp</b></div>
+                    <p class="viz-note">Scores are percentages. The multilingual value is the mean over the ten languages other than English.</p>
+                </div>
+                <figcaption>Average pass@3 across the four abilities. Every agent has a lower ten-language mean, but not by the same amount.</figcaption>
+            </figure>
+
+            <figure class="language-explorer" aria-labelledby="language-explorer-title">
+                <div class="explorer-heading">
+                    <div>
+                        <strong id="language-explorer-title">Scores by language</strong>
+                        <span>Choose a model and capability to inspect the per-language result.</span>
+                    </div>
+                    <label>Model
+                        <select id="model-select">
+                            <option>Claude 4.7 Opus</option>
+                            <option>GPT-5.4</option>
+                            <option>Gemini 3.1 Pro</option>
+                            <option>Kimi 2.6</option>
+                            <option>Gemma 4 31B</option>
+                            <option>Qwen 3.6 27B</option>
+                            <option>Qwen 3.6 35B-A3B</option>
+                        </select>
+                    </label>
+                </div>
+                <div class="capability-tabs" role="group" aria-label="Capability">
+                    <button type="button" data-capability="Execution" aria-pressed="true">Execution</button>
+                    <button type="button" data-capability="Search" aria-pressed="false">Search</button>
+                    <button type="button" data-capability="Adaptability" aria-pressed="false">Adaptability</button>
+                    <button type="button" data-capability="Ambiguity" aria-pressed="false">Ambiguity</button>
+                </div>
+                <div class="language-axis" aria-hidden="true"><span>0</span><span>25</span><span>50</span><span>75</span><span>100</span></div>
+                <div id="language-bars" class="language-bars" role="list" aria-live="polite"></div>
+                <figcaption>Per-capability pass@3 (%), rounded to the nearest percentage point as in the paper's heatmap. English is shown in blue; Appendix D reports exact values, Wilson 95% confidence intervals, and paired tests.</figcaption>
+            </figure>
+
+            <p>
+                Mandarin Chinese, Japanese, and Hindi are particularly difficult. At the aggregate level, the ordering of the four abilities remains stable: <strong>search &gt; execution &gt; adaptability &gt; ambiguity</strong>. Language changes the scores without changing the broad difficulty ordering, although individual model–language cells vary.
+            </p>
+
+            <h2 id="failures">The gap is about orchestration, not counting</h2>
+            <p>
+                We decomposed verifier failures for Claude 4.7 Opus, GPT-5.4, and Kimi 2.6. Failure rates on quantitative and categorical checks barely change across languages. The additional failures are instead concentrated in two places: the agent performs the wrong number of write actions, or its final reply does not contain the expected information.
+            </p>
+            <p>
+                Their behaviour changes too. Outside English, they spend more of their tool calls looking around and fewer of them taking action. The share of write actions falls by <strong>2.1 points for Claude</strong>, <strong>2.5 for GPT-5.4</strong>, and <strong>1.3 for Kimi</strong>. In other words, the agents search more and commit less.
+            </p>
+
+            <div class="behaviour-strip" aria-label="Agent behavior shift outside English">
+                <div class="behaviour-side explore">
+                    <span class="behaviour-icon" aria-hidden="true">⌕</span>
+                    <div><strong>More exploration</strong><small>Search, catalogue, and conversation reads take a larger share.</small></div>
+                </div>
+                <span class="behaviour-arrow" aria-hidden="true">→</span>
+                <div class="behaviour-side commit">
+                    <span class="behaviour-icon" aria-hidden="true">✓</span>
+                    <div><strong>Less commitment</strong><small>Write actions fall by 1.3 to 2.5 percentage points.</small></div>
+                </div>
+            </div>
+
+            <h2 id="attribution">How much of this is bad translation?</h2>
+            <p>
+                This was the first question we asked ourselves. If a translated task is broken, a lower score tells us nothing about the agent.
+            </p>
+            <p>
+                For Claude 4.7 Opus, an automatic diagnostic protocol compared target-language failures with matched English runs and assigned them to the agent, the translation, or the verifier. The estimate excludes infrastructure failures—<strong>8.5% of runs</strong>—and stratifies deterministic and stochastic regressions before reweighting them to the observed failure volume. Scenario-clustered bootstrap intervals quantify uncertainty.
+            </p>
+            <p>
+                Five native or fluent reviewers collectively re-adjudicated 149 sampled items across seven languages, independently of the automatic protocol. Nine were undecidable; on the remaining 140, the human judgment matched the automatic fault-side label in <strong>128 cases (91.4%, 95% CI 85.6–95.0)</strong>. Agreement was lower for Japanese—<strong>68.2%</strong>—where several agent-failure labels were reassigned to translation defects.
+            </p>
+
+            <figure class="figure-wide adaptive-figure">
+                <div class="attribution-visual" role="img" aria-label="Gap attribution: 55.4 percent agent failure, 34.5 percent translation defect, 10.1 percent verifier error. Translation makes 6.4 percent of all task and language pairs unsolvable.">
+                    <div class="viz-heading"><strong>Attribution of the multilingual gap</strong><span>Claude 4.7 Opus; infrastructure failures excluded</span></div>
+                    <div class="attribution-layout">
+                        <div class="attribution-breakdown">
+                            <strong class="panel-title">(a) Share of the observed gap</strong>
+                            <div class="attribution-bar"><span class="agent" style="--share:55.4%">55.4%</span><span class="translation" style="--share:34.5%">34.5%</span><span class="verifier" style="--share:10.1%">10.1%</span></div>
+                            <div class="attribution-key">
+                                <div><i class="agent"></i><p><strong>Agent failure</strong><span>Wrong, missing, or extra actions on a fair task</span></p></div>
+                                <div><i class="translation"></i><p><strong>Translation defect</strong><span>The translated task changes or loses a constraint</span></p></div>
+                                <div><i class="verifier"></i><p><strong>Verifier error</strong><span>A correct action is rejected by the evaluator</span></p></div>
+                            </div>
+                        </div>
+                        <div class="contamination-stat">
+                            <strong class="panel-title">(b) Translation contamination</strong>
+                            <div class="contamination-value">6.4%</div>
+                            <div class="contamination-track"><i></i></div>
+                            <small>of all task and language pairs are made unsolvable by translation</small>
+                        </div>
+                    </div>
+                    <p class="viz-note">Scenario-clustered 95% CIs: agent 50.3–60.7%; translation 29.5–39.1%; verifier 7.1–13.5%. The 6.4% result uses a different denominator: all scenario–language pairs.</p>
+                </div>
+                <figcaption>Most of the measured gap comes from the agents. Translation errors matter, but they explain a minority of it.</figcaption>
+            </figure>
+
+            <div class="callout caution-callout">
+                <span class="callout-eyebrow">An important distinction</span>
+                <p>Translation accounts for an estimated <strong>34.5%</strong> of the measured performance gap. Across the <em>whole benchmark</em>, the estimated bound is <strong>6.4%</strong> of scenario–language pairs made unsolvable by machine translation.</p>
+            </div>
+
+            <p>
+                In the infrastructure-clean Claude 4.7 Opus analysis, the target-language agent succeeds at least once on 74.5% of scenario–language pairs; under the paper's unsolvability definition, those pairs cannot be translation-contaminated. We audited samples from the remaining outcome cells—including tasks that also fail in English—to estimate the 6.4% benchmark-wide bound. Translation defects are material, but they do not account for most of the measured gap.
+            </p>
+
+            <h3>A larger model is not enough</h3>
+            <p>
+                A separate four-checkpoint Qwen 3.5 ablation reports <strong>pass@1</strong>, rather than the headline pass@3. Average performance rises across the tested ladder, but the English-minus-target gaps are <strong>8.1, 7.5, 10.4, and 12.7 points</strong>: scale does not consistently close the gap. This ablation uses a different Qwen generation from the Qwen 3.6 models above. A smaller Claude 4.7 Opus effort ablation likewise finds that increasing reasoning effort does not remove most of the gap.
+            </p>
+
+            <h2 id="language">Some cues do not survive translation</h2>
+            <p>
+                The most interesting failures are often not obviously bad translations. They happen when another language expresses a constraint differently, or does not state it explicitly at all.
+            </p>
+            <p>
+                This part of the study is qualitative: three linguists inspected traces for 16 scenarios spanning the four capabilities, and the paper presents six representative cases. The example below illustrates one mechanism; it is not a prevalence estimate.
+            </p>
+
+            <div class="linguistic-case">
+                <div class="case-prompt">
+                    <span>Ambiguity scenario</span>
+                    <blockquote>“Delete my <strong>contact</strong> from <strong>the US</strong>.”</blockquote>
+                    <small>The environment contains two matching US contacts.</small>
+                </div>
+                <div class="case-paths">
+                    <div class="case-path safe">
+                        <span class="language-chip">English · Spanish</span>
+                        <strong>The singular cue survives</strong>
+                        <p>The mismatch is visible. The agent usually asks which contact the user means.</p>
+                        <span class="case-outcome">No destructive action</span>
+                    </div>
+                    <div class="case-path risky">
+                        <span class="language-chip">Chinese · Japanese · Indonesian</span>
+                        <strong>The cue is not required</strong>
+                        <p>“My contact” can read as a generic set. The agent sees no conflict and deletes both.</p>
+                        <span class="case-outcome">Unsafe action</span>
+                    </div>
+                </div>
+            </div>
+
+            <p>
+                We saw the same pattern elsewhere. Translation can make an existing ambiguity worse. A preposition can remove a directional constraint. Number and article markers can disappear, changing whether the agent knows it should ask for clarification. Names and categories can also drift when the prompt uses one translation and an app uses another.
+            </p>
+            <p>
+                A separate model-assisted audit used Claude 5 Sonnet to examine Claude 4.7 Opus failures across 939 Mandarin, Hindi, and Japanese scenarios. It classified 88 failures (9%) as script-related, often because the evaluated agent noticed that a name existed in both native and Latin forms but searched for only one. The paper estimates an impact of roughly two pass@3 points for this agent; this audit does not establish the same rate for all seven systems.
+            </p>
+
+            <h2 id="limitations">What this benchmark does not establish</h2>
+            <ul class="limitations-list">
+                <li><strong>It covers four of seven GAIA2 capabilities.</strong> Time, Noise, and Agent2Agent require additional translation or verifier work.</li>
+                <li><strong>It is machine-translated.</strong> The full corpus was not professionally human-post-edited, so a bounded translation-defect floor remains.</li>
+                <li><strong>The judge has a human-reference ceiling.</strong> High judge agreement means parity with an imperfect annotation set, not absolute correctness.</li>
+                <li><strong>The leaderboard is harness-dependent.</strong> Kimi uses a different harness, and proprietary systems use provider-default reasoning effort; the effort ablation covers only one model and three target languages.</li>
+                <li><strong>Human audits are limited.</strong> They cover subsets of languages and scenarios rather than the complete matrix.</li>
+                <li><strong>Translation is not cultural localisation.</strong> These scores do not measure culturally appropriate agent behaviour.</li>
+            </ul>
+
+            <h2 id="conclusion">What this means</h2>
+            <p>
+                An English-only score is insufficient to characterise multilingual agent performance. For all seven evaluated agents, the ten-language mean is below English. The size of the loss varies, and the additional failures concentrate on using tools and carrying out actions rather than simple calculation.
+            </p>
+            <p>
+                OmnilingualGAIA2 gives us a way to measure that problem. The release includes the dataset, evaluation code, multilingual verifier, and human annotations. We hope multilingual agent evaluation becomes a normal part of model reporting.
+            </p>
+
+            <div class="callout omni-callout final-callout">
+                <p><strong>English should be one evaluation language, not the definition of the task.</strong></p>
+            </div>
+
+            <h2>Links</h2>
+            <div class="links-grid">
+                <a href="https://arxiv.org/abs/2608.08775" target="_blank" rel="noopener">Paper</a>
+                <a href="https://github.com/facebookresearch/meta-agents-research-environments" target="_blank" rel="noopener">Code</a>
+                <a href="https://huggingface.co/datasets/facebook/omnilingual-gaia2" target="_blank" rel="noopener">Dataset</a>
+                <a href="https://huggingface.co/papers/2608.08775" target="_blank" rel="noopener">Hugging Face</a>
+                <a href="../gaia2-cli/">Gaia2-CLI post</a>
+            </div>
+
+            <h2>Citation</h2>
+            <div class="citation-block">
+<pre><code>@misc{caciolai2026omnilingualgaia2,
+  title={OmnilingualGAIA2: Evaluating the Multilingual Gap
+    in Frontier AI Agents},
+  author={Andrea Caciolai and Pere-Lluís Huguet Cabot and
+    Chierh Cheng and Albert Ventayol-Boada and Gabriel Mejia Gonzalez
+    and Christophe Ropers and Lucas Bandarkar and Sebastian Ruder
+    and Darlene Sakakihara and Elliot Yun and Pierre Andrews
+    and Grégoire Mialon and Romain Froger and Marta R. Costa-jussà},
+  year={2026},
+  eprint={2608.08775},
+  archivePrefix={arXiv},
+  primaryClass={cs.CL},
+  url={https://arxiv.org/abs/2608.08775}
+}</code></pre>
+            </div>
+        </div>
+        </article>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">&copy; 2026 Romain Froger</div>
+    </footer>
+    <script>
+    (function() {
+        const tocLinks = document.querySelectorAll('.toc a');
+        const sections = Array.from(tocLinks).map(a => document.querySelector(a.getAttribute('href')));
+        function onScroll() {
+            let current = 0;
+            for (let i = 0; i < sections.length; i++) {
+                if (sections[i] && sections[i].getBoundingClientRect().top <= 100) current = i;
+            }
+            tocLinks.forEach((a, i) => {
+                const active = i === current;
+                a.classList.toggle('active', active);
+                if (active) a.setAttribute('aria-current', 'location');
+                else a.removeAttribute('aria-current');
+            });
+        }
+        window.addEventListener('scroll', onScroll, { passive: true });
+        onScroll();
+    })();
+    </script>
+    <script>
+    (function() {
+        const data = {
+            "Claude 4.7 Opus": {
+                Execution: [88, 84, 79, 83, 76, 82, 83, 78, 75, 70, 78],
+                Search: [96, 89, 78, 81, 81, 85, 86, 83, 82, 84, 82],
+                Adaptability: [76, 76, 70, 72, 74, 74, 74, 72, 73, 72, 72],
+                Ambiguity: [72, 69, 59, 61, 55, 61, 62, 67, 57, 52, 60]
+            },
+            "GPT-5.4": {
+                Execution: [81, 69, 69, 65, 70, 74, 71, 74, 57, 58, 64],
+                Search: [92, 87, 85, 88, 87, 84, 84, 78, 80, 77, 81],
+                Adaptability: [59, 51, 54, 52, 57, 51, 54, 52, 49, 43, 49],
+                Ambiguity: [42, 34, 36, 34, 29, 33, 33, 35, 31, 27, 31]
+            },
+            "Gemini 3.1 Pro": {
+                Execution: [66, 56, 59, 56, 54, 60, 59, 54, 61, 53, 49],
+                Search: [87, 81, 80, 78, 79, 78, 81, 76, 78, 75, 79],
+                Adaptability: [51, 46, 51, 51, 51, 53, 49, 46, 51, 43, 48],
+                Ambiguity: [44, 35, 38, 31, 32, 32, 29, 29, 25, 28, 25]
+            },
+            "Kimi 2.6": {
+                Execution: [74, 57, 56, 56, 58, 59, 51, 62, 53, 54, 58],
+                Search: [94, 91, 82, 86, 88, 88, 90, 78, 83, 79, 82],
+                Adaptability: [55, 48, 48, 47, 49, 42, 41, 46, 40, 43, 40],
+                Ambiguity: [42, 38, 29, 35, 31, 29, 30, 32, 34, 31, 28]
+            },
+            "Gemma 4 31B": {
+                Execution: [68, 57, 59, 59, 60, 62, 61, 57, 48, 41, 41],
+                Search: [86, 78, 76, 75, 75, 71, 75, 64, 57, 52, 42],
+                Adaptability: [63, 57, 57, 56, 58, 51, 59, 51, 48, 47, 48],
+                Ambiguity: [37, 28, 32, 31, 28, 28, 31, 30, 24, 20, 20]
+            },
+            "Qwen 3.6 27B": {
+                Execution: [78, 59, 59, 58, 60, 58, 62, 51, 48, 32, 32],
+                Search: [79, 75, 67, 71, 74, 68, 70, 60, 48, 38, 36],
+                Adaptability: [61, 61, 54, 59, 56, 51, 52, 53, 52, 38, 39],
+                Ambiguity: [31, 26, 23, 22, 29, 28, 22, 26, 25, 15, 14]
+            },
+            "Qwen 3.6 35B-A3B": {
+                Execution: [69, 46, 48, 44, 48, 47, 42, 39, 41, 26, 18],
+                Search: [84, 68, 62, 67, 62, 68, 64, 52, 47, 40, 33],
+                Adaptability: [48, 38, 36, 35, 33, 32, 41, 29, 32, 21, 14],
+                Ambiguity: [23, 14, 12, 14, 14, 16, 13, 14, 13, 12, 8]
+            }
+        };
+        const languages = ["English", "Spanish", "German", "French", "Italian", "Portuguese", "Indonesian", "Turkish", "Mandarin", "Japanese", "Hindi"];
+        const modelSelect = document.getElementById('model-select');
+        const bars = document.getElementById('language-bars');
+        const buttons = document.querySelectorAll('.capability-tabs button');
+        let capability = 'Execution';
+
+        function valuesFor(model) {
+            return data[model][capability];
+        }
+
+        function renderBars() {
+            const values = valuesFor(modelSelect.value);
+            bars.replaceChildren(...values.map((value, i) => {
+                const row = document.createElement('div');
+                row.className = 'language-row' + (i === 0 ? ' reference' : '');
+                row.setAttribute('role', 'listitem');
+                row.setAttribute('aria-label', `${languages[i]}: ${value} percent, rounded`);
+                const label = document.createElement('span');
+                label.textContent = languages[i];
+                const track = document.createElement('span');
+                track.className = 'language-track';
+                const bar = document.createElement('i');
+                bar.style.width = `${value}%`;
+                track.appendChild(bar);
+                const score = document.createElement('b');
+                score.textContent = String(value);
+                row.append(label, track, score);
+                return row;
+            }));
+        }
+
+        modelSelect.addEventListener('change', renderBars);
+        buttons.forEach(button => button.addEventListener('click', () => {
+            capability = button.dataset.capability;
+            buttons.forEach(item => item.setAttribute('aria-pressed', String(item === button)));
+            renderBars();
+        }));
+        renderBars();
+    })();
+    </script>
+</body>
+</html>

@@ -1,0 +1,78 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" role="img" aria-labelledby="title desc">
+  <title id="title">If an agent is meant for the world, it should be evaluated in the languages of the world</title>
+  <desc id="desc">A network of multilingual signals surrounds a globe beside the headline.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#07132f"/>
+      <stop offset="0.55" stop-color="#111c46"/>
+      <stop offset="1" stop-color="#20103f"/>
+    </linearGradient>
+    <radialGradient id="glowA" cx="50%" cy="50%" r="50%">
+      <stop offset="0" stop-color="#5b8cff" stop-opacity=".55"/>
+      <stop offset="1" stop-color="#5b8cff" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="glowB" cx="50%" cy="50%" r="50%">
+      <stop offset="0" stop-color="#bd5cff" stop-opacity=".4"/>
+      <stop offset="1" stop-color="#bd5cff" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="orbit" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#58d5ff"/>
+      <stop offset=".48" stop-color="#7584ff"/>
+      <stop offset="1" stop-color="#d377ff"/>
+    </linearGradient>
+    <linearGradient id="pill" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#14295e"/>
+      <stop offset="1" stop-color="#35205e"/>
+    </linearGradient>
+    <filter id="soft" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="22"/>
+    </filter>
+    <filter id="shadow" x="-30%" y="-30%" width="160%" height="160%">
+      <feDropShadow dx="0" dy="8" stdDeviation="14" flood-color="#050817" flood-opacity=".42"/>
+    </filter>
+  </defs>
+
+  <rect width="1200" height="630" rx="30" fill="url(#bg)"/>
+  <circle cx="930" cy="130" r="240" fill="url(#glowA)" filter="url(#soft)"/>
+  <circle cx="1075" cy="505" r="250" fill="url(#glowB)" filter="url(#soft)"/>
+  <path d="M0 525C250 445 374 600 636 505s354-50 564 4v121H0z" fill="#182653" opacity=".4"/>
+  <path d="M0 560c242-82 400 38 619-24 250-72 355-71 581 5" fill="none" stroke="#607dff" stroke-opacity=".18" stroke-width="2"/>
+
+  <g transform="translate(76 78)">
+    <rect width="224" height="36" rx="18" fill="#fff" fill-opacity=".09" stroke="#fff" stroke-opacity=".17"/>
+    <circle cx="22" cy="18" r="5" fill="#62d6ff"/>
+    <text x="38" y="23" fill="#d9e4ff" font-family="Inter,Arial,sans-serif" font-size="13" font-weight="700" letter-spacing="1.3">OMNILINGUALGAIA2</text>
+    <text x="0" y="105" fill="#fff" font-family="Inter,Arial,sans-serif" font-size="45" font-weight="750" letter-spacing="-1.2">If an agent is meant</text>
+    <text x="0" y="156" fill="#fff" font-family="Inter,Arial,sans-serif" font-size="45" font-weight="750" letter-spacing="-1.2">for the world,</text>
+    <text x="0" y="207" fill="#fff" font-family="Inter,Arial,sans-serif" font-size="45" font-weight="750" letter-spacing="-1.2">it should be evaluated</text>
+    <text x="0" y="258" fill="#fff" font-family="Inter,Arial,sans-serif" font-size="45" font-weight="750" letter-spacing="-1.2">in the languages</text>
+    <text x="0" y="309" fill="url(#orbit)" font-family="Inter,Arial,sans-serif" font-size="45" font-weight="750" letter-spacing="-1.2">of the world.</text>
+  </g>
+
+  <g transform="translate(900 314)" filter="url(#shadow)">
+    <circle r="153" fill="#101c41" stroke="url(#orbit)" stroke-width="2.5"/>
+    <circle r="124" fill="none" stroke="#91b1ff" stroke-opacity=".35" stroke-width="1.5"/>
+    <ellipse rx="55" ry="124" fill="none" stroke="#91b1ff" stroke-opacity=".42" stroke-width="1.5"/>
+    <ellipse rx="124" ry="47" fill="none" stroke="#91b1ff" stroke-opacity=".42" stroke-width="1.5"/>
+    <path d="M-106-66c48 31 165 31 212 0M-106 66c48-31 165-31 212 0" fill="none" stroke="#91b1ff" stroke-opacity=".35" stroke-width="1.5"/>
+    <path d="M-153 0h306M0-153v306" stroke="#91b1ff" stroke-opacity=".27" stroke-width="1.5"/>
+    <circle cx="-72" cy="-74" r="6" fill="#58d5ff"/>
+    <circle cx="87" cy="-35" r="6" fill="#a57bff"/>
+    <circle cx="-34" cy="105" r="6" fill="#d377ff"/>
+    <circle cx="104" cy="80" r="6" fill="#58d5ff"/>
+  </g>
+
+  <g font-family="Inter,Arial,sans-serif" font-size="16" font-weight="700" text-anchor="middle">
+    <g transform="translate(781 104)"><rect x="-42" y="-20" width="84" height="40" rx="20" fill="url(#pill)" stroke="#5a79ca"/><text y="6" fill="#fff">Hello</text></g>
+    <g transform="translate(1011 96)"><rect x="-38" y="-20" width="76" height="40" rx="20" fill="url(#pill)" stroke="#7d66ce"/><text y="6" fill="#fff">你好</text></g>
+    <g transform="translate(1110 237)"><rect x="-40" y="-20" width="80" height="40" rx="20" fill="url(#pill)" stroke="#8b67ce"/><text y="6" fill="#fff">नमस्ते</text></g>
+    <g transform="translate(1068 472)"><rect x="-46" y="-20" width="92" height="40" rx="20" fill="url(#pill)" stroke="#8966ce"/><text y="6" fill="#fff">こんにちは</text></g>
+    <g transform="translate(829 533)"><rect x="-38" y="-20" width="76" height="40" rx="20" fill="url(#pill)" stroke="#4f89ca"/><text y="6" fill="#fff">Hola</text></g>
+    <g transform="translate(708 390)"><rect x="-43" y="-20" width="86" height="40" rx="20" fill="url(#pill)" stroke="#4f89ca"/><text y="6" fill="#fff">Merhaba</text></g>
+  </g>
+
+  <g fill="none" stroke="url(#orbit)" stroke-width="2" stroke-linecap="round" opacity=".65">
+    <path d="M813 124l29 59"/><path d="M997 117l-32 61"/><path d="M1073 246l-50 28"/>
+    <path d="M1037 454l-41-40"/><path d="M837 510l29-49"/><path d="M747 383l34-18"/>
+  </g>
+</svg>
