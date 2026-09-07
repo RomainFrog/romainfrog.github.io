@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
+  <url>
+    <loc>https://romainfrog.github.io/</loc>
+    <lastmod>2026-09-07</lastmod>
+    <image:image>
+      <image:loc>https://romainfrog.github.io/social-card.png</image:loc>
+      <image:title>Romain Froger — AI agent researcher</image:title>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://romainfrog.github.io/blog/omnilingual-gaia2/</loc>
+    <lastmod>2026-09-07</lastmod>
+    <image:image>
+      <image:loc>https://romainfrog.github.io/blog/omnilingual-gaia2/social-card.png</image:loc>
+      <image:title>OmnilingualGAIA2: Evaluating AI Agents Across Ten Languages</image:title>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://romainfrog.github.io/blog/gaia2-cli/</loc>
+    <lastmod>2026-09-07</lastmod>
+    <image:image>
+      <image:loc>https://romainfrog.github.io/blog/gaia2-cli/social-card.png</image:loc>
+      <image:title>Gaia2-CLI: Evaluating Agentic Systems in Real Execution Environments</image:title>
+    </image:image>
+  </url>
+</urlset>

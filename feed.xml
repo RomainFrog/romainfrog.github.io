@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Romain Froger — Blog</title>
+    <link>https://romainfrog.github.io/</link>
+    <description>Research notes on AI agents, evaluation environments, and agent benchmarks by Romain Froger.</description>
+    <language>en</language>
+    <lastBuildDate>Mon, 07 Sep 2026 00:00:00 +0200</lastBuildDate>
+    <atom:link href="https://romainfrog.github.io/feed.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>OmnilingualGAIA2: Evaluating AI Agents Across Ten Languages</title>
+      <link>https://romainfrog.github.io/blog/omnilingual-gaia2/</link>
+      <guid isPermaLink="true">https://romainfrog.github.io/blog/omnilingual-gaia2/</guid>
+      <pubDate>Wed, 12 Aug 2026 00:00:00 +0200</pubDate>
+      <description>A machine-translated expansion of four GAIA2 capabilities, evaluating seven AI agents across ten languages beyond English.</description>
+    </item>
+    <item>
+      <title>Gaia2-CLI: Evaluating Agentic Systems in Real Execution Environments</title>
+      <link>https://romainfrog.github.io/blog/gaia2-cli/</link>
+      <guid isPermaLink="true">https://romainfrog.github.io/blog/gaia2-cli/</guid>
+      <pubDate>Wed, 15 Apr 2026 00:00:00 +0200</pubDate>
+      <description>Gaia2-CLI adds first-class terminal support to the Gaia2 benchmark for evaluating agentic systems in real execution environments.</description>
+    </item>
+  </channel>
+</rss>
